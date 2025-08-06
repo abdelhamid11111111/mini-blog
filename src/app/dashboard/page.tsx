@@ -114,7 +114,7 @@ export default function Dashboard() {
           <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
             <div className="flex justify-between gap-3 p-4">
               <p className="text-[32px] font-bold text-[#121416] tracking-light leading-tight">Your Posts</p>
-              <Link href="/createblog">
+              <Link href="/dashboard/createblog">
                 <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#f1f2f4] text-[#121416] text-sm font-medium leading-normal">
                   <span className="truncate">New Post</span>
                 </button>
@@ -144,7 +144,7 @@ export default function Dashboard() {
                                 </p>
                               </div>
                               
-                              <Link href="/createblog">
+                              <Link href="/dashboard/createblog">
                                 <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#f1f2f4] text-[#121416] text-sm font-bold leading-normal tracking-[0.015em]">
                                   <span className="truncate">Create Post</span>
                                 </button>
