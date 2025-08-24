@@ -123,7 +123,7 @@ export default function SignUp() {
                     <span className="truncate">Sign Up</span>
                 </button>
                 </form>
-                <Link href='/signin' className="text-[#60748a] text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center underline">
+                <Link href='/login' className="text-[#60748a] text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center underline">
                    Already have an account?
                 </Link>
             </div>

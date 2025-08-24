@@ -1,36 +1,63 @@
 'use client';
-import React, { useState } from 'react'
+import React, { FormEvent, useState } from 'react'
 import Link from 'next/link';
 import Navbar from '../components/navbar';
-import { signIn } from 'next-auth/react';
 import { toast } from 'sonner';
+import { useAuth } from '../api/auth/contexts/AuthContext'
 import { useRouter } from 'next/navigation';
 
 
 
 const SignIn = () => {
 
-    const [email, setEmail] = useState<string>('')
-    const [password, setPassword] = useState<string>('')
-    const [error, setError] = useState<string | null>(null);
-    const route = useRouter()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  
+  const { login, checkAuthStatus } = useAuth() // ✅ Get functions from context
+  const router = useRouter()
 
 
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        const res = await signIn('credentials', {
-            redirect: false,
-            email,
-            password
+      e.preventDefault()
+      setLoading(true)
+      setError('')
+      
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({ email, password }),
         })
-
-        if(res?.ok){
-            route.push('/')
-            toast.success('login successful')
-        } else{
-          setError(res?.error ?? 'An unexpected error occurred');
+  
+        const data = await response.json()
+        
+        if (response.ok) {
+          // ✅ Update auth context immediately
+          login({ email: data.user.email })
+          
+          // ✅ Also refresh auth status to make sure everything is in sync
+          await checkAuthStatus()
+          
+          console.log('Login successful, redirecting...')
+          
+          // Redirect to dashboard or home
+          router.push('/dashboard')
+          toast.success('Login successfully')
+        } else {
+          setError(data.message || 'Login failed')
         }
+      } catch (error) {
+        console.error('Login error:', error)
+        setError('Login failed')
+      } finally {
+        setLoading(false)
+      }
     }
 
   return (

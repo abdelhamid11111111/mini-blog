@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { Newsreader, Noto_Sans } from 'next/font/google';
 import "./globals.css";
-import AuthProvider from './providers/AuthProviders';
 import { Toaster } from 'sonner';
+import { AuthProvider } from '../app/api/auth/contexts/AuthContext'
+
+
+
 
 const newsreader = Newsreader({
   weight: ['400', '500', '700', '800'],

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import User from "../../../../../models/user";
 import bcrypt from "bcryptjs";
 
-// error
+
 export async function POST(req: Request){
     try{
         await connectDB()

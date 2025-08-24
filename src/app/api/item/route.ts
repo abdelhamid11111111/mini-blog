@@ -1,22 +1,37 @@
 // app/api/item/route.ts
 
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "../../../../lib/authOptions"
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { connectDB } from "../../../../lib/db"
 import post from "../../../../models/post"
+import { verifyJwt, parseAuthCookie } from "../../../../utils/jwt"
 
-export async function GET() {
+
+
+function authenticationRequest(req: Request){
+  const token = parseAuthCookie(req.headers.get('cookie'))
+
+  if(!token){
+    return null
+  }
+  const payload = verifyJwt(token)
+  if(payload){
+    return payload
+  }
+} 
+
+
+export async function GET(req: NextRequest) {
+
+  const user = await authenticationRequest(req)
+  if (!user || !user.email) {
+    return NextResponse.json({ message: "Not authenticated" }, { status: 401 })
+  }
+
   try {
-    const session = await getServerSession(authOptions)
-
-    if (!session?.user?.email) {
-      return NextResponse.json({ message: "Not authenticated" }, { status: 401 })
-    }
 
     await connectDB()
 
-    const posts = await post.find({ userEmail: session.user.email }).sort({ createdAt: -1 })
+    const posts = await post.find({ userEmail: user.email }).sort({ createdAt: -1 })
 
     return NextResponse.json({ posts }, { status: 200 })
   } catch (error) {
@@ -26,13 +41,13 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+
+  const user = await authenticationRequest(req)
+  if (!user || !user.email) {
+    return NextResponse.json({ message: "Not authenticated" }, { status: 401 })
+  }
   try {
-    const session = await getServerSession(authOptions)
-
-    if (!session?.user?.email) {
-      return NextResponse.json({ message: "Not authenticated" }, { status: 401 })
-    }
-
+    
     const { title, description, image } = await req.json()
     await connectDB()
 
@@ -40,14 +55,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "All fields are required" }, { status: 400 })
     }
 
-    console.log("Creating post for:", session.user.email)
-    console.log("Post data:", { title, description, image, userEmail: session.user.email })
     
     const newPost = await post.create({
       title,
       description,
       image,
-      userEmail: session.user.email, // ✅ Save by email
+      userEmail: user.email, // ✅ Save by email
     })
 
     return NextResponse.json(newPost, { status: 201 })
